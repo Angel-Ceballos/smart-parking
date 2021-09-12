@@ -1,0 +1,5 @@
+{
+    "CLASSES": ["license_plate", "car"],
+    "DETECTION_ZONE": [[810, 375], [630, 310], [900, 130], [1000, 160]],
+    "KEY": ""
+}

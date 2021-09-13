@@ -22,7 +22,38 @@ Acknowlegment
 Prerequisite
 ------------
 
-  The first step is to install a JetPack copy on your Jetson system. If you have not done this, follow the [Nvidia tutorial](https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit). In my case, I have JetPack-4.6. Also JK Jung recomeds following these steps, [Setting up Jetson Nano: The Basics](https://jkjung-avt.github.io/setting-up-nano/) and/or [Setting up Jetson Xavier NX](https://jkjung-avt.github.io/setting-up-xavier-nx/).
+  The first step is to install a JetPack copy on your Jetson system. If you have not done this, follow the [Nvidia tutorial](https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit). In my case, I have JetPack-4.6. Also JK Jung recomeds following these steps, [Setting up Jetson Nano: The Basics](https://jkjung-avt.github.io/setting-up-nano/) and/or [Setting up Jetson Xavier NX](https://jkjung-avt.github.io/setting-up-xavier-nx/). Here is a summary of the commands you need to run.
+
+   1. Add CUDA toolkit related paths to the environment variables.
+
+      ```shell
+      $ ./install_basics.sh
+      ```
+
+   2. Create an 8GB memory swap because the Jetson Nano has only 4GB of ram. 
+
+      ```shell
+      $ sudo fallocate -l 8G /mnt/8GB.swap
+      $ sudo mkswap /mnt/8GB.swap
+      $ sudo swapon /mnt/8GB.swap
+      ```
+
+   3. Add `mnt/8GB.swap  none  swap  sw 0  0`   to /etc/fstab, for this I used nano.
+
+      ```shell
+      $ sudo su
+      $ nano /etc/fstab
+      ```
+
+   4. Check your swap memory (maybe you will need to reboot).
+
+      ```shell
+      $ free -m
+                  total        used        free      shared  buff/cache   available
+      Mem:           3956        3265          72          63         617         469
+      Swap:         10170        1804        8365
+      ```
+
 
 The target Jetson system must have TensorRT libraries installed.
 
@@ -32,23 +63,29 @@ The target Jetson system must have TensorRT libraries installed.
 
 You could check which version of TensorRT has been installed on your Jetson system. Run the following commnad in the terminal.
 
-```shell
-$ ls /usr/lib/aarch64-linux-gnu/libnvinfer.so*
-```
-I got this on my JetPack version 4.6:
+   ```shell
+   $ ls /usr/lib/aarch64-linux-gnu/libnvinfer.so*
+   ```
 
-```shell
-/usr/lib/aarch64-linux-gnu/libnvinfer.so
-/usr/lib/aarch64-linux-gnu/libnvinfer.so.8
-/usr/lib/aarch64-linux-gnu/libnvinfer.so.8.0.1
-```
+   I got this on my JetPack version 4.6:
+
+   ```shell
+   /usr/lib/aarch64-linux-gnu/libnvinfer.so
+   /usr/lib/aarch64-linux-gnu/libnvinfer.so.8
+   /usr/lib/aarch64-linux-gnu/libnvinfer.so.8.0.1
+   ```
 
 This demo uses the opencv version included with JetPack (4.1.1).If you'd prefer building your own, refer to [Installing OpenCV 3.4.6 on Jetson Nano](https://jkjung-avt.github.io/opencv-on-nano/) for how to build from source and install opencv-3.4.6 on your Jetson system.
 
 
 You need to have "protobuf" installed for this demo.  Mr. Jung recommends installing "protobuf-3.8.0" using [install_protobuf-3.8.0.sh](https://github.com/jkjung-avt/jetson_nano/blob/master/install_protobuf-3.8.0.sh) script.  This script would take a couple of hours on a Jetson system.  Alternatively, pip3 install a recent version of "protobuf" should also work (but might run a little bit slowlier).
 
-In case you are setting up a Jetson Nano or Jetson Xavier NX from scratch check this first.
+   5. Intall protobuf.
+      ```shell
+      $ ./install_protobuf-3.8.0.sh
+      ```
+
+In case you are setting up a Jetson Nano or Jetson Xavier NX from scratch this may be helpful.
 
 * [JetPack-4.5](https://jkjung-avt.github.io/jetpack-4.5/)
 
@@ -56,12 +93,12 @@ In case you are setting up a Jetson Nano or Jetson Xavier NX from scratch check 
 YOLOv4
 ---------------
 
-Convert pre-trained yolov3 and yolov4 models through ONNX to TensorRT engines.
+Convert pre-trained yolov3 and yolov4 models through ONNX to TensorRT engines. You may skip these steps as the files are already included in the directory.
 
 1. Install "pycuda".
 
    ```shell
-   $ cd ${HOME}/project/smart-parking
+   $ cd ${HOME}/smart-parking
    $ ./install_pycuda.sh
    ```
 
@@ -74,14 +111,14 @@ Convert pre-trained yolov3 and yolov4 models through ONNX to TensorRT engines.
 3. Go to the "plugins/" subdirectory and build the "yolo_layer" plugin.  When done, a "libyolo_layer.so" would be generated.
 
    ```shell
-   $ cd ${HOME}/project/smart-parking/plugins
+   $ cd ${HOME}/smart-parking/plugins
    $ make
    ```
 
-4. Convert the targeted model to ONNX and then to TensorRT engine.  I used "yolov4-tiny-custom" but if you want to try your own just verify that the weights file and config have the same name, example: “yolov4-tiny-custom.cfg” and “yolov4-tiny-custom.weights”. You may skip this step as it is already included in the directory. 
+4. Convert the targeted model to ONNX and then to TensorRT engine.  I used "yolov4-tiny-custom" but if you want to try your own just verify that the weights file and config have the same name, example: “yolov4-tiny-custom.cfg” and “yolov4-tiny-custom.weights”. 
 
    ```shell
-   $ cd ${HOME}/project/smart-parking/yolo
+   $ cd ${HOME}/smart-parking/yolo
    $ python3 yolo_to_onnx.py -m yolov4-tiny-custom
    $ python3 onnx_to_tensorrt.py -m yolov4-tiny-custom
    ```
@@ -109,8 +146,12 @@ Lets install some dependencies related to the script and and add your API key to
 1. Install Shapely.
 
    ```shell
-   $ cd ${HOME}/project/smart-parking
+   $ cd ${HOME}/smart-parking
    $ ./install_shapely.sh
+   ```
+   If permission is denied run this and then repeate the command above.
+   ```shell
+   $ chmod +x install_shapely.sh
    ```
 
 2. In order to detect the car's license plate number we will use an OCR Api called Plate Recognizer. The advantages of using this api are that it was specifically trained for plate recognition (robust model) and it gives you 2500 calls per month for free. Create your account at [Plate Recognizer](https://platerecognizer.com/) and add you api token to cfg.json.
@@ -120,7 +161,7 @@ Lets install some dependencies related to the script and and add your API key to
 3. Run inference over video.
 
    ```shell
-      $ cd ${HOME}/project/smart-parking
+      $ cd ${HOME}/smart-parking
       $ python3 trt_yolo_cv.py -v videos/my_lp_10.mp4 -m yolov4-tiny-custom -s -d -z
    ```
    View Results:

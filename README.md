@@ -125,7 +125,7 @@ Lets install some dependencies related to the script and and add your API key to
    ```
    View Results:
 
-   [![Hands detected](https://raw.githubusercontent.com/jkjung-avt/tensorrt_demos/master/doc/hands.png)](https://youtu.be/fSZR6RCJQnk)
+   [![Car detected](https://github.com/Angel-Ceballos/smart-parking/blob/6706f88e14b9b01a7d699ca911cf6ffa2b14eeb7/docs/car_detection.png?raw=true)](https://youtu.be/fSZR6RCJQnk)
 
    Flag Description
    * `--video videos/my_lp_10.mp4`: a video to run the inference.
